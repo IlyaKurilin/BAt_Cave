@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Icon Generator - Flappy Bird</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: linear-gradient(135deg, #70c5ce 0%, #4a9eff 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(0,0,0,0.2);
+            padding: 20px;
+            border-radius: 15px;
+        }
+        canvas {
+            border: 2px solid white;
+            margin: 10px;
+            border-radius: 10px;
+        }
+        .icon-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+        .icon-item {
+            text-align: center;
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 10px;
+        }
+        button {
+            background: #FFD700;
+            color: #333;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        button:hover {
+            background: #FFA500;
+        }
+        .instructions {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .download-all {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .download-all button {
+            font-size: 18px;
+            padding: 12px 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐦 Flappy Bird - Icon Generator</h1>
+        
+        <div class="instructions">
+            <h3>📱 Инструкция по созданию иконок для PWA:</h3>
+            <ol>
+                <li>Нажмите кнопку "Создать все иконки" ниже</li>
+                <li>Каждая иконка автоматически скачается в папку загрузок</li>
+                <li>Переместите все PNG файлы в папку <code>assets/</code></li>
+                <li>Иконки будут работать для установки PWA приложения</li>
+            </ol>
+        </div>
+
+        <div class="download-all">
+            <button onclick="generateAllIcons()">🚀 Создать все иконки</button>
+        </div>
+
+        <div class="icon-grid" id="iconGrid">
+            <!-- Иконки будут созданы здесь -->
+        </div>
+    </div>
+
+    <script>
+        const iconSizes = [72, 96, 128, 144, 152, 192, 384, 512];
+        let generatedCount = 0;
+
+        function drawIcon(canvas, size) {
+            const ctx = canvas.getContext('2d');
+            const scale = size / 512;
+
+            // Очистка canvas
+            ctx.clearRect(0, 0, size, size);
+
+            // Фон с градиентом неба
+            const skyGradient = ctx.createLinearGradient(0, 0, 0, size);
+            skyGradient.addColorStop(0, '#87CEEB');
+            skyGradient.addColorStop(0.7, '#98FB98');
+            skyGradient.addColorStop(1, '#228B22');
+            
+            ctx.fillStyle = skyGradient;
+            ctx.fillRect(0, 0, size, size);
+
+            // Облака (только для больших иконок)
+            if (size >= 128) {
+                ctx.fillStyle = 'rgba(255,255,255,0.7)';
+                ctx.beginPath();
+                ctx.arc(120 * scale, 80 * scale, 25 * scale, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.beginPath();
+                ctx.arc(140 * scale, 75 * scale, 30 * scale, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.beginPath();
+                ctx.arc(160 * scale, 80 * scale, 25 * scale, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Трубы
+            ctx.fillStyle = '#228B22';
+            ctx.strokeStyle = '#1a5f1a';
+            ctx.lineWidth = Math.max(1, 2 * scale);
+
+            // Левые трубы
+            ctx.fillRect(80 * scale, 0, 40 * scale, 180 * scale);
+            ctx.strokeRect(80 * scale, 0, 40 * scale, 180 * scale);
+            
+            ctx.fillRect(75 * scale, 160 * scale, 50 * scale, 20 * scale);
+            ctx.strokeRect(75 * scale, 160 * scale, 50 * scale, 20 * scale);
+
+            ctx.fillRect(80 * scale, 320 * scale, 40 * scale, (512-320) * scale);
+            ctx.strokeRect(80 * scale, 320 * scale, 40 * scale, (512-320) * scale);
+            
+            ctx.fillRect(75 * scale, 300 * scale, 50 * scale, 20 * scale);
+            ctx.strokeRect(75 * scale, 300 * scale, 50 * scale, 20 * scale);
+
+            // Правые трубы
+            if (size >= 192) {
+                ctx.fillRect(400 * scale, 0, 40 * scale, 150 * scale);
+                ctx.strokeRect(400 * scale, 0, 40 * scale, 150 * scale);
+                
+                ctx.fillRect(395 * scale, 130 * scale, 50 * scale, 20 * scale);
+                ctx.strokeRect(395 * scale, 130 * scale, 50 * scale, 20 * scale);
+
+                ctx.fillRect(400 * scale, 280 * scale, 40 * scale, (512-280) * scale);
+                ctx.strokeRect(400 * scale, 280 * scale, 40 * scale, (512-280) * scale);
+                
+                ctx.fillRect(395 * scale, 260 * scale, 50 * scale, 20 * scale);
+                ctx.strokeRect(395 * scale, 260 * scale, 50 * scale, 20 * scale);
+            }
+
+            // Земля
+            ctx.fillStyle = '#228B22';
+            ctx.fillRect(0, 480 * scale, size, 32 * scale);
+            
+            ctx.fillStyle = '#32CD32';
+            ctx.fillRect(0, 485 * scale, size, 15 * scale);
+
+            // Текстура земли (только для больших иконок)
+            if (size >= 128) {
+                ctx.fillStyle = '#228B22';
+                for (let x = 0; x < size; x += 50 * scale) {
+                    ctx.fillRect(x, 490 * scale, 25 * scale, 10 * scale);
+                }
+            }
+
+            // Птица
+            const birdX = 256 * scale;
+            const birdY = 230 * scale;
+            const birdW = 35 * scale;
+            const birdH = 28 * scale;
+
+            // Градиент для птицы
+            const birdGradient = ctx.createRadialGradient(
+                birdX, birdY, 0,
+                birdX, birdY, Math.max(birdW, birdH)
+            );
+            birdGradient.addColorStop(0, '#FFD700');
+            birdGradient.addColorStop(1, '#FFA500');
+
+            // Тело птицы
+            ctx.fillStyle = birdGradient;
+            ctx.beginPath();
+            ctx.ellipse(birdX, birdY, birdW, birdH, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = '#CC8400';
+            ctx.lineWidth = Math.max(1, 2 * scale);
+            ctx.stroke();
+
+            // Крыло птицы
+            const wingGradient = ctx.createRadialGradient(
+                birdX - 11 * scale, birdY - 5 * scale, 0,
+                birdX - 11 * scale, birdY - 5 * scale, 22 * scale
+            );
+            wingGradient.addColorStop(0, '#FFA500');
+            wingGradient.addColorStop(1, '#FF8C00');
+
+            ctx.fillStyle = wingGradient;
+            ctx.beginPath();
+            ctx.ellipse(birdX - 11 * scale, birdY - 5 * scale, 22 * scale, 18 * scale, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = '#CC6600';
+            ctx.lineWidth = Math.max(1, 1.5 * scale);
+            ctx.stroke();
+
+            // Клюв птицы
+            ctx.fillStyle = '#FF6B47';
+            ctx.beginPath();
+            ctx.moveTo((birdX + birdW - 6 * scale), birdY - 2 * scale);
+            ctx.lineTo((birdX + birdW + 14 * scale), birdY - 8 * scale);
+            ctx.lineTo((birdX + birdW + 14 * scale), birdY + 4 * scale);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.strokeStyle = '#CC4400';
+            ctx.lineWidth = Math.max(1, 1 * scale);
+            ctx.stroke();
+
+            // Глаз птицы
+            if (size >= 64) {
+                ctx.fillStyle = '#000';
+                ctx.beginPath();
+                ctx.arc(birdX + 14 * scale, birdY - 10 * scale, 6 * scale, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (size >= 96) {
+                    ctx.fillStyle = '#FFF';
+                    ctx.beginPath();
+                    ctx.arc(birdX + 16 * scale, birdY - 12 * scale, 2 * scale, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            // Эффект power-up (только для больших иконок)
+            if (size >= 192) {
+                ctx.strokeStyle = '#FFD700';
+                ctx.lineWidth = 3 * scale;
+                ctx.setLineDash([5 * scale, 5 * scale]);
+                ctx.globalAlpha = 0.6;
+                ctx.beginPath();
+                ctx.arc(birdX, birdY, 50 * scale, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.globalAlpha = 1;
+
+                // Звездочки
+                drawStar(ctx, 200 * scale, 180 * scale, 5 * scale, '#FFD700');
+                drawStar(ctx, 320 * scale, 190 * scale, 5 * scale, '#FFD700');
+            }
+
+            // Заголовок (только для больших иконок)
+            if (size >= 384) {
+                ctx.fillStyle = '#FFF';
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 1;
+                ctx.font = `bold ${24 * scale}px Arial, sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.strokeText('Flappy Bird', birdX, 460 * scale);
+                ctx.fillText('Flappy Bird', birdX, 460 * scale);
+
+                ctx.font = `${12 * scale}px Arial, sans-serif`;
+                ctx.globalAlpha = 0.8;
+                ctx.fillText('Enhanced', birdX, 475 * scale);
+                ctx.globalAlpha = 1;
+            }
+        }
+
+        function drawStar(ctx, x, y, size, color) {
+            ctx.fillStyle = color;
+            ctx.globalAlpha = 0.8;
+            ctx.beginPath();
+            ctx.moveTo(x, y - size);
+            ctx.lineTo(x + size * 0.2, y - size * 0.2);
+            ctx.lineTo(x + size, y - size * 0.2);
+            ctx.lineTo(x + size * 0.3, y + size * 0.2);
+            ctx.lineTo(x + size * 0.5, y + size);
+            ctx.lineTo(x, y + size * 0.4);
+            ctx.lineTo(x - size * 0.5, y + size);
+            ctx.lineTo(x - size * 0.3, y + size * 0.2);
+            ctx.lineTo(x - size, y - size * 0.2);
+            ctx.lineTo(x - size * 0.2, y - size * 0.2);
+            ctx.closePath();
+            ctx.fill();
+            ctx.globalAlpha = 1;
+        }
+
+        function downloadIcon(canvas, size) {
+            const link = document.createElement('a');
+            link.download = `icon-${size}.png`;
+            link.href = canvas.toDataURL('image/png');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function createIconElement(size) {
+            const iconItem = document.createElement('div');
+            iconItem.className = 'icon-item';
+
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            canvas.style.width = '80px';
+            canvas.style.height = '80px';
+
+            const label = document.createElement('div');
+            label.textContent = `${size}x${size}`;
+            label.style.fontWeight = 'bold';
+            label.style.marginBottom = '5px';
+
+            const button = document.createElement('button');
+            button.textContent = 'Скачать';
+            button.onclick = () => downloadIcon(canvas, size);
+
+            drawIcon(canvas, size);
+
+            iconItem.appendChild(label);
+            iconItem.appendChild(canvas);
+            iconItem.appendChild(button);
+
+            return iconItem;
+        }
+
+        function generateAllIcons() {
+            const iconGrid = document.getElementById('iconGrid');
+            iconGrid.innerHTML = '';
+
+            iconSizes.forEach((size, index) => {
+                setTimeout(() => {
+                    const iconElement = createIconElement(size);
+                    iconGrid.appendChild(iconElement);
+                    
+                    // Автоматически скачиваем каждую иконку
+                    setTimeout(() => {
+                        const canvas = iconElement.querySelector('canvas');
+                        downloadIcon(canvas, size);
+                        generatedCount++;
+                        
+                        if (generatedCount === iconSizes.length) {
+                            alert(`✅ Все иконки созданы и скачаны!\n\nПереместите файлы icon-*.png в папку assets/`);
+                        }
+                    }, 100);
+                }, index * 200);
+            });
+        }
+
+        // Создаем превью при загрузке страницы
+        window.onload = function() {
+            const iconGrid = document.getElementById('iconGrid');
+            iconSizes.forEach(size => {
+                const iconElement = createIconElement(size);
+                iconGrid.appendChild(iconElement);
+            });
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flappy Bird - Status Check</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #70c5ce 0%, #4a9eff 100%);
+            color: white;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .status-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 15px;
+        }
+        .status-item {
+            background: rgba(255,255,255,0.1);
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #FFD700;
+        }
+        .status-ok { border-left-color: #4CAF50; }
+        .status-error { border-left-color: #f44336; }
+        .status-warning { border-left-color: #ff9800; }
+        .game-link {
+            display: inline-block;
+            background: #FFD700;
+            color: #333;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+        }
+        .game-link:hover {
+            background: #FFA500;
+            transform: translateY(-2px);
+        }
+        pre {
+            background: rgba(0,0,0,0.5);
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="status-container">
+        <h1>🐦 Flappy Bird Enhanced - Статус системы</h1>
+        
+        <div class="status-item status-ok">
+            <h3>✅ Сервер запущен</h3>
+            <p>Python HTTP сервер работает на порту 8000</p>
+        </div>
+
+        <div class="status-item" id="manifestStatus">
+            <h3>📱 PWA Manifest</h3>
+            <p id="manifestText">Проверка...</p>
+        </div>
+
+        <div class="status-item" id="swStatus">
+            <h3>⚙️ Service Worker</h3>
+            <p id="swText">Проверка...</p>
+        </div>
+
+        <div class="status-item" id="iconsStatus">
+            <h3>🖼️ Иконки</h3>
+            <p id="iconsText">Проверка...</p>
+        </div>
+
+        <div class="status-item" id="scriptsStatus">
+            <h3>📜 JavaScript файлы</h3>
+            <p id="scriptsText">Проверка...</p>
+        </div>
+
+        <div class="status-item">
+            <h3>🌐 Доступ к игре</h3>
+            <p>Игра доступна по следующим адресам:</p>
+            <ul>
+                <li><strong>Локально:</strong> <a href="http://localhost:8000" style="color: #FFD700;">http://localhost:8000</a></li>
+                <li><strong>Сеть:</strong> http://[IP-адрес]:8000</li>
+            </ul>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="/" class="game-link">🎮 Запустить игру</a>
+        </div>
+
+        <div class="status-item">
+            <h3>📊 Системная информация</h3>
+            <pre id="systemInfo">Загрузка...</pre>
+        </div>
+
+        <div class="status-item">
+            <h3>🛠️ Действия по устранению неполадок</h3>
+            <ul>
+                <li><strong>Если игра не загружается:</strong> Обновите страницу (F5 или Ctrl+R)</li>
+                <li><strong>Если есть ошибки JavaScript:</strong> Откройте DevTools (F12) и проверьте Console</li>
+                <li><strong>Если не работают иконки:</strong> Очистите кеш браузера</li>
+                <li><strong>Для тестирования PWA:</strong> Используйте Chrome или Edge</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Проверка статуса различных компонентов
+        async function checkStatus() {
+            // Проверка manifest
+            try {
+                const manifestResponse = await fetch('/manifest.json');
+                if (manifestResponse.ok) {
+                    document.getElementById('manifestStatus').className = 'status-item status-ok';
+                    document.getElementById('manifestText').textContent = '✅ Manifest.json загружен успешно';
+                } else {
+                    throw new Error('Не удалось загрузить manifest');
+                }
+            } catch (error) {
+                document.getElementById('manifestStatus').className = 'status-item status-error';
+                document.getElementById('manifestText').textContent = '❌ Ошибка загрузки manifest: ' + error.message;
+            }
+
+            // Проверка Service Worker
+            try {
+                const swResponse = await fetch('/sw.js');
+                if (swResponse.ok) {
+                    document.getElementById('swStatus').className = 'status-item status-ok';
+                    document.getElementById('swText').textContent = '✅ Service Worker файл доступен';
+                } else {
+                    throw new Error('Не удалось загрузить sw.js');
+                }
+            } catch (error) {
+                document.getElementById('swStatus').className = 'status-item status-error';
+                document.getElementById('swText').textContent = '❌ Ошибка загрузки SW: ' + error.message;
+            }
+
+            // Проверка иконок
+            const iconSizes = [72, 96, 128, 144, 152, 192, 384, 512];
+            let iconsOk = 0;
+            
+            for (const size of iconSizes) {
+                try {
+                    const iconResponse = await fetch(`/assets/icon-${size}.png`);
+                    if (iconResponse.ok) {
+                        iconsOk++;
+                    }
+                } catch (error) {
+                    console.log(`Icon ${size} not found`);
+                }
+            }
+
+            if (iconsOk === iconSizes.length) {
+                document.getElementById('iconsStatus').className = 'status-item status-ok';
+                document.getElementById('iconsText').textContent = `✅ Все иконки найдены (${iconsOk}/${iconSizes.length})`;
+            } else if (iconsOk > 0) {
+                document.getElementById('iconsStatus').className = 'status-item status-warning';
+                document.getElementById('iconsText').textContent = `⚠️ Найдено иконок: ${iconsOk}/${iconSizes.length}`;
+            } else {
+                document.getElementById('iconsStatus').className = 'status-item status-error';
+                document.getElementById('iconsText').textContent = '❌ Иконки не найдены';
+            }
+
+            // Проверка JavaScript файлов
+            const jsFiles = ['main.js', 'game.js', 'bird.js', 'pipes.js', 'powerups.js', 'achievements.js', 'ui.js'];
+            let jsOk = 0;
+            
+            for (const file of jsFiles) {
+                try {
+                    const jsResponse = await fetch(`/js/${file}`);
+                    if (jsResponse.ok) {
+                        jsOk++;
+                    }
+                } catch (error) {
+                    console.log(`JS file ${file} not found`);
+                }
+            }
+
+            if (jsOk === jsFiles.length) {
+                document.getElementById('scriptsStatus').className = 'status-item status-ok';
+                document.getElementById('scriptsText').textContent = `✅ Все JS файлы найдены (${jsOk}/${jsFiles.length})`;
+            } else {
+                document.getElementById('scriptsStatus').className = 'status-item status-error';
+                document.getElementById('scriptsText').textContent = `❌ JS файлов найдено: ${jsOk}/${jsFiles.length}`;
+            }
+        }
+
+        // Системная информация
+        function getSystemInfo() {
+            const info = {
+                'User Agent': navigator.userAgent,
+                'Платформа': navigator.platform,
+                'Язык': navigator.language,
+                'Cookies включены': navigator.cookieEnabled,
+                'Онлайн': navigator.onLine,
+                'Service Worker поддерживается': 'serviceWorker' in navigator,
+                'Размер экрана': `${screen.width}x${screen.height}`,
+                'Размер окна': `${window.innerWidth}x${window.innerHeight}`,
+                'Текущий URL': window.location.href,
+                'Время загрузки': new Date().toLocaleString()
+            };
+
+            let infoText = '';
+            for (const [key, value] of Object.entries(info)) {
+                infoText += `${key}: ${value}\n`;
+            }
+
+            document.getElementById('systemInfo').textContent = infoText;
+        }
+
+        // Запуск проверок
+        checkStatus();
+        getSystemInfo();
+
+        // Обновление каждые 30 секунд
+        setInterval(checkStatus, 30000);
+    </script>
+</body>
+</html>

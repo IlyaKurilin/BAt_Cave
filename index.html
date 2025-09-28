@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bat Cave Explorer - Enhanced Edition</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Bat Cave Explorer">
+    <link rel="apple-touch-icon" href="assets/icon-192.png">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+</head>
+<body>
+    <div class="game-container">
+        <canvas id="gameCanvas"></canvas>
+        
+        <!-- Game UI Overlay -->
+        <div class="ui-overlay">
+            <!-- Main Menu -->
+            <div id="mainMenu" class="screen">
+                <h1 class="game-title">🦇 Bat Cave Explorer</h1>
+                <h2 class="game-subtitle">Enhanced Edition</h2>
+                <div class="menu-buttons">
+                    <button id="playBtn" class="btn btn-primary">Играть</button>
+                    <button id="settingsBtn" class="btn btn-secondary">Настройки</button>
+                    <button id="achievementsBtn" class="btn btn-secondary">Достижения</button>
+                    <button id="helpBtn" class="btn btn-secondary">📖 Справка</button>
+                    <button id="fullscreenBtn" class="btn btn-secondary">📺 Полный экран</button>
+                </div>
+                <div class="high-score">
+                    Лучший результат: <span id="highScore">0</span>
+                </div>
+            </div>
+
+            <!-- Game HUD -->
+            <div id="gameHUD" class="screen hidden">
+                <div class="score-display">
+                    <span id="currentScore">0</span>
+                </div>
+                <div class="power-up-indicator">
+                    <div id="powerUpIcon" class="power-up-icon hidden"></div>
+                    <div id="powerUpTimer" class="power-up-timer hidden"></div>
+                </div>
+                <div class="controls-hint">
+                    <span class="desktop-hint">Нажмите SPACE или кликните для полёта</span>
+                    <span class="mobile-hint">Касайтесь экрана для полёта</span>
+                </div>
+            </div>
+
+            <!-- Game Over Screen -->
+            <div id="gameOverScreen" class="screen hidden">
+                <h2 class="game-over-title">Игра окончена!</h2>
+                <div class="final-score">
+                    Ваш результат: <span id="finalScore">0</span>
+                </div>
+                <div class="best-score">
+                    Лучший результат: <span id="bestScore">0</span>
+                </div>
+                <div class="achievements-earned" id="achievementsEarned"></div>
+                <div class="game-over-buttons">
+                    <button id="restartBtn" class="btn btn-primary">Играть снова</button>
+                    <button id="menuBtn" class="btn btn-secondary">Главное меню</button>
+                </div>
+            </div>
+
+            <!-- God Mode Finale Screen -->
+            <div id="godModeFinaleScreen" class="screen hidden">
+                <h1 class="finale-title">🎆 НЕВОЗМОЖНО! 🎆</h1>
+                <h2 class="finale-subtitle">You are monster!</h2>
+                <h3 class="finale-message">You fuck this game!</h3>
+                <p class="finale-score">Финальный счёт: <span id="finaleScore">1000+</span></p>
+                <p class="finale-note">🎮 Режим разработчика не сохраняет рекорды</p>
+                <div class="menu-buttons">
+                    <button id="finaleMenuBtn" class="btn btn-primary">🏠 Вернуться к реальности</button>
+                </div>
+            </div>
+
+            <!-- Settings Screen -->
+            <div id="settingsScreen" class="screen hidden">
+                <h2>Настройки</h2>
+                <div class="settings-group">
+                    <label>
+                        <input type="checkbox" id="soundToggle" checked>
+                        Звук
+                    </label>
+                </div>
+                <div class="settings-group">
+                    <label>
+                        <input type="checkbox" id="godModeToggle">
+                        🎮 Режим разработчика (бессмертие)
+                    </label>
+                </div>
+                <div class="settings-group">
+                    <label>
+                        Сложность:
+                        <select id="difficultySelect">
+                            <option value="easy">Легкая</option>
+                            <option value="normal" selected>Обычная</option>
+                            <option value="hard">Сложная</option>
+                            <option value="extreme">Экстремальная</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="settings-group">
+                    <label>
+                        <input type="checkbox" id="powerUpsToggle" checked>
+                        Бонусы
+                    </label>
+                </div>
+                <button id="backToMenuBtn" class="btn btn-secondary">Назад</button>
+            </div>
+
+            <!-- Achievements Screen -->
+            <div id="achievementsScreen" class="screen hidden">
+                <h2>Достижения</h2>
+                <div id="achievementsList" class="achievements-list">
+                    <!-- Achievements will be populated by JavaScript -->
+                </div>
+                <button id="achievementsBackBtn" class="btn btn-secondary">Назад</button>
+            </div>
+
+            <!-- Help Screen -->
+            <div id="helpScreen" class="screen hidden">
+                <h2>📖 Справка по игре</h2>
+                <div class="help-content">
+                    
+                    <!-- Game Controls -->
+                    <div class="help-section">
+                        <h3>🎮 Управление</h3>
+                        <div class="help-item">
+                            <strong>SPACE / Клик / Тап</strong> - полёт летучей мыши
+                        </div>
+                        <div class="help-item">
+                            <strong>ESC</strong> - пауза / возврат в меню
+                        </div>
+                    </div>
+
+                    <!-- Power-ups Section -->
+                    <div class="help-section">
+                        <h3>⭐ Магические способности (Power-ups)</h3>
+                        
+                        <div class="powerup-grid">
+                            <div class="powerup-card shield">
+                                <div class="powerup-icon">🛡️</div>
+                                <div class="powerup-info">
+                                    <h4>Защитный барьер</h4>
+                                    <p>Защищает от одного столкновения со скалами. Летучая мышь окрашивается в синий цвет.</p>
+                                    <span class="powerup-duration">Длительность: 8 сек</span>
+                                </div>
+                            </div>
+
+                            <div class="powerup-card immortal">
+                                <div class="powerup-icon">✨</div>
+                                <div class="powerup-info">
+                                    <h4>Бессмертие</h4>
+                                    <p>Делает летучую мышь неуязвимой к любым столкновениям. Мышь окрашивается в золотой цвет.</p>
+                                    <span class="powerup-duration">Длительность: 5 сек</span>
+                                </div>
+                            </div>
+
+                            <div class="powerup-card doublepoints">
+                                <div class="powerup-icon">💰</div>
+                                <div class="powerup-info">
+                                    <h4>Двойные очки</h4>
+                                    <p>Удваивает количество получаемых очков. Окрашивает мышь в зелёный цвет.</p>
+                                    <span class="powerup-duration">Длительность: 10 сек</span>
+                                </div>
+                            </div>
+
+                            <div class="powerup-card smallbat">
+                                <div class="powerup-icon">🐣</div>
+                                <div class="powerup-info">
+                                    <h4>Мини-мышь</h4>
+                                    <p>Уменьшает размер летучей мыши, облегчая прохождение узких мест. Розовый цвет.</p>
+                                    <span class="powerup-duration">Длительность: 8 сек</span>
+                                </div>
+                            </div>
+
+                            <div class="powerup-card extralife">
+                                <div class="powerup-icon">❤️</div>
+                                <div class="powerup-info">
+                                    <h4>Дополнительная жизнь</h4>
+                                    <p>Даёт +5 очков сразу при сборе. Мгновенный эффект.</p>
+                                    <span class="powerup-duration">Мгновенно</span>
+                                </div>
+                            </div>
+
+                            <div class="powerup-card magnet">
+                                <div class="powerup-icon">🧲</div>
+                                <div class="powerup-info">
+                                    <h4>Магнитное поле</h4>
+                                    <p>Притягивает другие способности к летучей мыши. Оранжевый цвет + магнитное поле.</p>
+                                    <span class="powerup-duration">Длительность: 12 сек</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Obstacles Section -->
+                    <div class="help-section">
+                        <h3>🗿 Типы препятствий</h3>
+                        <div class="obstacles-grid">
+                            <div class="obstacle-item">
+                                <div class="obstacle-color normal"></div>
+                                <span><strong>Обычные скалы</strong> - стандартные препятствия</span>
+                            </div>
+                            <div class="obstacle-item">
+                                <div class="obstacle-color narrow"></div>
+                                <span><strong>Узкие проходы</strong> - меньший зазор (+2 очка)</span>
+                            </div>
+                            <div class="obstacle-item">
+                                <div class="obstacle-color wide"></div>
+                                <span><strong>Широкие проходы</strong> - больший зазор</span>
+                            </div>
+                            <div class="obstacle-item">
+                                <div class="obstacle-color moving"></div>
+                                <span><strong>Движущиеся скалы</strong> - вертикальное движение (+3 очка)</span>
+                            </div>
+                            <div class="obstacle-item">
+                                <div class="obstacle-color rotating"></div>
+                                <span><strong>Вращающиеся скалы</strong> - поворачиваются (+2 очка)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tips Section -->
+                    <div class="help-section">
+                        <h3>💡 Советы</h3>
+                        <ul class="tips-list">
+                            <li>Собирайте способности для облегчения прохождения</li>
+                            <li>Защитный барьер поглощает одно столкновение</li>
+                            <li>Разные типы скал дают разное количество очков</li>
+                            <li>Магнит помогает собирать способности издалека</li>
+                            <li>Мини-мышь идеальна для узких проходов</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <button id="helpBackBtn" class="btn btn-secondary">Назад</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Scripts -->
+    <script src="js/sound.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/bird.js"></script>
+    <script src="js/pipes.js"></script>
+    <script src="js/powerups.js"></script>
+    <script src="js/achievements.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/main.js"></script>
+
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('Service Worker registered'))
+                .catch(err => console.log('Service Worker registration failed'));
+        }
+    </script>
+</body>
+</html>

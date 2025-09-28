@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Create Missing Icons</title>
+</head>
+<body>
+    <h1>Creating missing icons...</h1>
+    <script>
+        // Создаем базовую иконку программно
+        function createIcon(size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            
+            // Простая иконка с птичкой
+            const scale = size / 144;
+            
+            // Фон
+            const gradient = ctx.createLinearGradient(0, 0, 0, size);
+            gradient.addColorStop(0, '#87CEEB');
+            gradient.addColorStop(1, '#228B22');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+            
+            // Птичка
+            ctx.fillStyle = '#FFD700';
+            ctx.beginPath();
+            ctx.arc(size/2, size/2, 20 * scale, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Глаз
+            ctx.fillStyle = '#000';
+            ctx.beginPath();
+            ctx.arc(size/2 + 5 * scale, size/2 - 5 * scale, 3 * scale, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Клюв
+            ctx.fillStyle = '#FF6B47';
+            ctx.beginPath();
+            ctx.moveTo(size/2 + 15 * scale, size/2);
+            ctx.lineTo(size/2 + 25 * scale, size/2 - 3 * scale);
+            ctx.lineTo(size/2 + 25 * scale, size/2 + 3 * scale);
+            ctx.closePath();
+            ctx.fill();
+            
+            return canvas.toDataURL('image/png');
+        }
+        
+        // Создаем и скачиваем иконки
+        const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+        let completed = 0;
+        
+        sizes.forEach((size, index) => {
+            setTimeout(() => {
+                const dataUrl = createIcon(size);
+                const link = document.createElement('a');
+                link.download = `icon-${size}.png`;
+                link.href = dataUrl;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                completed++;
+                document.body.innerHTML = `<h1>Created ${completed}/${sizes.length} icons</h1>`;
+                
+                if (completed === sizes.length) {
+                    document.body.innerHTML += '<h2>✅ All icons created! Move them to assets/ folder</h2>';
+                }
+            }, index * 500);
+        });
+        
+        // Создаем favicon
+        setTimeout(() => {
+            const faviconData = createIcon(32);
+            const link = document.createElement('a');
+            link.download = 'favicon.ico';
+            link.href = faviconData;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            document.body.innerHTML += '<h2>✅ Favicon created too!</h2>';
+        }, sizes.length * 500 + 500);
+    </script>
+</body>
+</html>

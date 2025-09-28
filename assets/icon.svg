@@ -1,0 +1,118 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" fill="#70c5ce"/>
+  
+  <!-- Sky gradient -->
+  <defs>
+    <linearGradient id="skyGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#87CEEB"/>
+      <stop offset="70%" style="stop-color:#98FB98"/>
+      <stop offset="100%" style="stop-color:#228B22"/>
+    </linearGradient>
+    
+    <!-- Bird gradient -->
+    <linearGradient id="birdGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD700"/>
+      <stop offset="100%" style="stop-color:#FFA500"/>
+    </linearGradient>
+    
+    <!-- Wing gradient -->
+    <linearGradient id="wingGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFA500"/>
+      <stop offset="100%" style="stop-color:#FF8C00"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background with gradient -->
+  <rect width="512" height="512" fill="url(#skyGradient)"/>
+  
+  <!-- Clouds -->
+  <circle cx="120" cy="80" r="25" fill="rgba(255,255,255,0.7)"/>
+  <circle cx="140" cy="75" r="30" fill="rgba(255,255,255,0.7)"/>
+  <circle cx="160" cy="80" r="25" fill="rgba(255,255,255,0.7)"/>
+  
+  <circle cx="350" cy="120" r="20" fill="rgba(255,255,255,0.6)"/>
+  <circle cx="365" cy="115" r="25" fill="rgba(255,255,255,0.6)"/>
+  <circle cx="380" cy="120" r="20" fill="rgba(255,255,255,0.6)"/>
+  
+  <!-- Pipes -->
+  <rect x="80" y="0" width="40" height="180" fill="#228B22" stroke="#1a5f1a" stroke-width="2"/>
+  <rect x="75" y="160" width="50" height="20" fill="#228B22" stroke="#1a5f1a" stroke-width="2"/>
+  
+  <rect x="80" y="320" width="40" height="192" fill="#228B22" stroke="#1a5f1a" stroke-width="2"/>
+  <rect x="75" y="300" width="50" height="20" fill="#228B22" stroke="#1a5f1a" stroke-width="2"/>
+  
+  <rect x="400" y="0" width="40" height="150" fill="#228B22" stroke="#1a5f1a" stroke-width="2"/>
+  <rect x="395" y="130" width="50" height="20" fill="#228B22" stroke="#1a5f1a" stroke-width="2"/>
+  
+  <rect x="400" y="280" width="40" height="232" fill="#228B22" stroke="#1a5f1a" stroke-width="2"/>
+  <rect x="395" y="260" width="50" height="20" fill="#228B22" stroke="#1a5f1a" stroke-width="2"/>
+  
+  <!-- Ground -->
+  <rect x="0" y="480" width="512" height="32" fill="#228B22"/>
+  <rect x="0" y="485" width="512" height="15" fill="#32CD32"/>
+  
+  <!-- Ground texture -->
+  <rect x="0" y="490" width="25" height="10" fill="#228B22"/>
+  <rect x="50" y="490" width="25" height="10" fill="#228B22"/>
+  <rect x="100" y="490" width="25" height="10" fill="#228B22"/>
+  <rect x="150" y="490" width="25" height="10" fill="#228B22"/>
+  <rect x="200" y="490" width="25" height="10" fill="#228B22"/>
+  <rect x="250" y="490" width="25" height="10" fill="#228B22"/>
+  <rect x="300" y="490" width="25" height="10" fill="#228B22"/>
+  <rect x="350" y="490" width="25" height="10" fill="#228B22"/>
+  <rect x="400" y="490" width="25" height="10" fill="#228B22"/>
+  <rect x="450" y="490" width="25" height="10" fill="#228B22"/>
+  
+  <!-- Bird body -->
+  <ellipse cx="256" cy="230" rx="35" ry="28" fill="url(#birdGradient)" stroke="#CC8400" stroke-width="2"/>
+  
+  <!-- Bird wing -->
+  <ellipse cx="245" cy="225" rx="22" ry="18" fill="url(#wingGradient)" stroke="#CC6600" stroke-width="1.5"/>
+  
+  <!-- Bird beak -->
+  <polygon points="285,228 305,222 305,234" fill="#FF6B47" stroke="#CC4400" stroke-width="1"/>
+  
+  <!-- Bird eye -->
+  <circle cx="270" cy="220" r="6" fill="#000"/>
+  <circle cx="272" cy="218" r="2" fill="#FFF"/>
+  
+  <!-- Power-up effect around bird -->
+  <circle cx="256" cy="230" r="50" fill="none" stroke="#FFD700" stroke-width="3" opacity="0.6" stroke-dasharray="5,5">
+    <animateTransform
+      attributeName="transform"
+      attributeType="XML"
+      type="rotate"
+      from="0 256 230"
+      to="360 256 230"
+      dur="3s"
+      repeatCount="indefinite"/>
+  </circle>
+  
+  <!-- Stars/sparkles -->
+  <polygon points="200,180 202,185 207,185 203,188 205,193 200,190 195,193 197,188 193,185 198,185" fill="#FFD700" opacity="0.8">
+    <animateTransform
+      attributeName="transform"
+      attributeType="XML"
+      type="rotate"
+      from="0 200 180"
+      to="360 200 180"
+      dur="4s"
+      repeatCount="indefinite"/>
+  </polygon>
+  
+  <polygon points="320,190 322,195 327,195 323,198 325,203 320,200 315,203 317,198 313,195 318,195" fill="#FFD700" opacity="0.8">
+    <animateTransform
+      attributeName="transform"
+      attributeType="XML"
+      type="rotate"
+      from="0 320 190"
+      to="360 320 190"
+      dur="3.5s"
+      repeatCount="indefinite"/>
+  </polygon>
+  
+  <!-- Game title at bottom -->
+  <text x="256" y="460" font-family="Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="#FFF" stroke="#333" stroke-width="1">Flappy Bird</text>
+  <text x="256" y="475" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#FFF" opacity="0.8">Enhanced</text>
+</svg>
