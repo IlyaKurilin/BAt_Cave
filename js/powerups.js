@@ -1,5 +1,5 @@
 // PowerUps.js - Система бонусов и улучшений
-window.PowerUp = class PowerUp {
+class PowerUp {
     constructor(x, y, type) {
         this.x = x;
         this.y = y;
@@ -271,7 +271,7 @@ window.PowerUp = class PowerUp {
     }
 }
 
-window.PowerUpManager = class PowerUpManager {
+class PowerUpManager {
     constructor(game) {
         this.game = game;
         this.powerUps = [];
@@ -543,3 +543,7 @@ window.PowerUpManager = class PowerUpManager {
         this.minSpawnDistance = setting.minSpawnDistance;
     }
 }
+
+// Экспортируем классы для использования в других модулях
+window.PowerUp = PowerUp;
+window.PowerUpManager = PowerUpManager;

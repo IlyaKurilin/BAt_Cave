@@ -1,5 +1,5 @@
 // Pipes.js - Система труб с различными типами и коллизиями
-window.Pipe = class Pipe {
+class Pipe {
     constructor(x, gap, gapY, type = 'normal') {
         this.x = x;
         this.width = 60;
@@ -336,7 +336,7 @@ window.Pipe = class Pipe {
     }
 }
 
-window.PipeManager = class PipeManager {
+class PipeManager {
     constructor(game) {
         this.game = game;
         this.pipes = [];
@@ -522,3 +522,7 @@ window.PipeManager = class PipeManager {
         }
     }
 }
+
+// Экспортируем классы для использования в других модулях
+window.Pipe = Pipe;
+window.PipeManager = PipeManager;

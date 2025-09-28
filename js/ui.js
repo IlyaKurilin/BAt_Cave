@@ -10,6 +10,8 @@ class UI {
     
     setGame(game) {
         this.game = game;
+        console.log('🔗 UI: Игра привязана, переустанавливаем обработчики...');
+        this.rebindGameDependentHandlers();
     }
     
     setupEventListeners() {
@@ -22,13 +24,25 @@ class UI {
             this.showSettings();
         });
         
-        document.getElementById('achievementsBtn').addEventListener('click', () => {
-            this.showAchievements();
-        });
+        const achievementsBtn = document.getElementById('achievementsBtn');
+        if (achievementsBtn) {
+            achievementsBtn.addEventListener('click', () => {
+                console.log('🏆 UI: Клик по кнопке достижений');
+                this.showAchievements();
+            });
+        } else {
+            console.error('❌ UI: Кнопка достижений не найдена!');
+        }
         
-        document.getElementById('helpBtn').addEventListener('click', () => {
-            this.showHelp();
-        });
+        const helpBtn = document.getElementById('helpBtn');
+        if (helpBtn) {
+            helpBtn.addEventListener('click', () => {
+                console.log('📖 UI: Клик по кнопке справки');
+                this.showHelp();
+            });
+        } else {
+            console.error('❌ UI: Кнопка справки не найдена!');
+        }
         
         document.getElementById('fullscreenBtn').addEventListener('click', () => {
             this.toggleFullscreen();
@@ -52,38 +66,28 @@ class UI {
             this.showMainMenu();
         });
         
-        document.getElementById('achievementsBackBtn').addEventListener('click', () => {
-            this.showMainMenu();
-        });
+        const achievementsBackBtn = document.getElementById('achievementsBackBtn');
+        if (achievementsBackBtn) {
+            achievementsBackBtn.addEventListener('click', () => {
+                console.log('🏆 UI: Клик по кнопке "Назад" в достижениях');
+                this.showMainMenu();
+            });
+        } else {
+            console.error('❌ UI: Кнопка "Назад" в достижениях не найдена!');
+        }
         
-        document.getElementById('helpBackBtn').addEventListener('click', () => {
-            this.showMainMenu();
-        });
+        const helpBackBtn = document.getElementById('helpBackBtn');
+        if (helpBackBtn) {
+            helpBackBtn.addEventListener('click', () => {
+                console.log('📖 UI: Клик по кнопке "Назад" в справке');
+                this.showMainMenu();
+            });
+        } else {
+            console.error('❌ UI: Кнопка "Назад" в справке не найдена!');
+        }
         
-        // Настройки
-        document.getElementById('soundToggle').addEventListener('change', (e) => {
-            if (this.game) {
-                this.game.saveSoundEnabled(e.target.checked);
-            }
-        });
-        
-        document.getElementById('godModeToggle').addEventListener('change', (e) => {
-            if (this.game) {
-                this.game.saveGodMode(e.target.checked);
-            }
-        });
-        
-        document.getElementById('difficultySelect').addEventListener('change', (e) => {
-            if (this.game) {
-                this.game.saveDifficulty(e.target.value);
-            }
-        });
-        
-        document.getElementById('powerUpsToggle').addEventListener('change', (e) => {
-            if (this.game) {
-                this.game.savePowerUpsEnabled(e.target.checked);
-            }
-        });
+        // Обработчики настроек будут установлены в rebindGameDependentHandlers()
+        // после привязки игры к UI
         
         // Управление с клавиатуры
         document.addEventListener('keydown', (e) => {
@@ -142,6 +146,56 @@ class UI {
         document.body.style.cursor = 'none';
     }
     
+    rebindGameDependentHandlers() {
+        // Переустанавливаем обработчики, которые зависят от this.game
+        
+        // Селект сложности
+        const difficultySelect = document.getElementById('difficultySelect');
+        if (difficultySelect && this.game) {
+            // Удаляем старые обработчики (если есть)
+            const newSelect = difficultySelect.cloneNode(true);
+            difficultySelect.parentNode.replaceChild(newSelect, difficultySelect);
+            
+            // Добавляем новый обработчик
+            newSelect.addEventListener('change', (e) => {
+                console.log('🎯 UI: Изменение сложности на', e.target.value);
+                this.game.saveDifficulty(e.target.value);
+            });
+        }
+        
+        // Переключатель power-ups
+        const powerUpsToggle = document.getElementById('powerUpsToggle');
+        if (powerUpsToggle && this.game) {
+            powerUpsToggle.onchange = (e) => {
+                this.game.savePowerUpsEnabled(e.target.checked);
+            };
+        }
+        
+        // Переключатель god mode
+        const godModeToggle = document.getElementById('godModeToggle');
+        if (godModeToggle && this.game) {
+            godModeToggle.onchange = (e) => {
+                this.game.saveGodMode(e.target.checked);
+            };
+        }
+        
+        // Переключатель звука
+        const soundToggle = document.getElementById('soundToggle');
+        if (soundToggle && this.game) {
+            soundToggle.onchange = (e) => {
+                this.game.saveSoundEnabled(e.target.checked);
+            };
+        }
+        
+        console.log('✅ UI: Обработчики переустановлены');
+        
+        // Если пользователь находится на экране достижений, обновляем их
+        if (this.currentScreen === 'achievements') {
+            console.log('🔄 UI: Обновляем достижения после привязки игры');
+            this.showAchievements();
+        }
+    }
+    
     showMainMenu() {
         this.hideAllScreens();
         this.showScreen('mainMenu');
@@ -185,24 +239,56 @@ class UI {
         // Обновляем значения настроек
         if (this.game) {
             document.getElementById('soundToggle').checked = this.game.soundEnabled;
+            
+            // Обновляем обычный селект сложности
             document.getElementById('difficultySelect').value = this.game.difficulty;
+            
             document.getElementById('powerUpsToggle').checked = this.game.powerUpsEnabled;
             document.getElementById('godModeToggle').checked = this.game.godMode;
         }
+        
+        // Убираем обработчик экрана - пусть селект работает свободно
     }
     
+    
     showAchievements() {
+        console.log('🏆 UI: Открываем экран достижений');
+        
+        // Проверяем, что экран существует
+        const achievementsScreen = document.getElementById('achievementsScreen');
+        if (!achievementsScreen) {
+            console.error('❌ UI: Экран достижений не найден!');
+            return;
+        }
+        
         this.hideAllScreens();
         this.showScreen('achievementsScreen');
         this.currentScreen = 'achievements';
         
         // Обновляем список достижений
         if (this.game && this.game.achievements) {
+            console.log('📊 UI: Обновляем список достижений');
             this.game.achievements.populateAchievementsList();
+        } else {
+            console.warn('⚠️ UI: Игра или система достижений не инициализированы');
+            // Показываем базовый экран достижений без данных
+            const achievementsList = document.getElementById('achievementsList');
+            if (achievementsList) {
+                achievementsList.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.7);">Загрузка достижений...</p>';
+            }
         }
     }
     
     showHelp() {
+        console.log('📖 UI: Открываем экран справки');
+        
+        // Проверяем, что экран существует
+        const helpScreen = document.getElementById('helpScreen');
+        if (!helpScreen) {
+            console.error('❌ UI: Экран справки не найден!');
+            return;
+        }
+        
         this.hideAllScreens();
         this.showScreen('helpScreen');
         this.currentScreen = 'help';
@@ -225,6 +311,7 @@ class UI {
             const screen = document.getElementById(screenId);
             if (screen) {
                 screen.classList.add('hidden');
+                screen.style.display = 'none';
             }
         });
     }
@@ -233,6 +320,7 @@ class UI {
         const screen = document.getElementById(screenId);
         if (screen) {
             screen.classList.remove('hidden');
+            screen.style.display = 'flex';
         }
     }
     
@@ -476,7 +564,8 @@ class UI {
             `;
         }
     }
+    
 }
 
-// Создаем глобальный экземпляр UI
-window.UI = new UI();
+// Экспортируем класс для использования в других модулях
+window.UI = UI;

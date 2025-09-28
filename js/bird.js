@@ -1,5 +1,5 @@
 // Bird.js - Класс птицы с физикой и анимацией
-window.Bird = class Bird {
+class Bird {
     constructor(game) {
         this.game = game;
         
@@ -464,3 +464,6 @@ window.Bird = class Bird {
         return colors[powerUp] || '#FFF';
     }
 }
+
+// Экспортируем класс для использования в других модулях
+window.Bird = Bird;

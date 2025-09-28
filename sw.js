@@ -1,7 +1,7 @@
-// Service Worker для Flappy Bird Enhanced
-const CACHE_NAME = 'flappy-bird-v1.0.0';
-const STATIC_CACHE = 'flappy-bird-static-v1';
-const DYNAMIC_CACHE = 'flappy-bird-dynamic-v1';
+// Service Worker для Bat Cave Explorer Enhanced
+const CACHE_NAME = 'bat-cave-v3.0.0';
+const STATIC_CACHE = 'bat-cave-static-v3';
+const DYNAMIC_CACHE = 'bat-cave-dynamic-v3';
 
 // Файлы для кеширования
 const STATIC_FILES = [
@@ -50,14 +50,12 @@ self.addEventListener('activate', event => {
   
   event.waitUntil(
     Promise.all([
-      // Удаляем старые кеши
+      // Удаляем ВСЕ старые кеши при обновлении
       caches.keys().then(cacheNames => {
         return Promise.all(
           cacheNames.map(cacheName => {
-            if (cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE) {
-              console.log('SW: Deleting old cache:', cacheName);
-              return caches.delete(cacheName);
-            }
+            console.log('SW: Deleting cache:', cacheName);
+            return caches.delete(cacheName);
           })
         );
       }),
@@ -82,6 +80,12 @@ self.addEventListener('fetch', event => {
     return;
   }
   
+  // Стратегия Network First для JavaScript файлов (всегда свежие)
+  if (isJavaScriptFile(request.url)) {
+    event.respondWith(networkFirst(request));
+    return;
+  }
+  
   // Стратегия Cache First для статических файлов
   if (isStaticFile(request.url)) {
     event.respondWith(cacheFirst(request));
@@ -102,10 +106,14 @@ self.addEventListener('fetch', event => {
 function isStaticFile(url) {
   return STATIC_FILES.some(file => url.includes(file)) || 
          url.includes('.css') || 
-         url.includes('.js') || 
          url.includes('.png') || 
          url.includes('.jpg') || 
          url.includes('.ico');
+}
+
+// Проверка, является ли файл JavaScript
+function isJavaScriptFile(url) {
+  return url.includes('.js');
 }
 
 // Проверка, требует ли URL стратегию Network First

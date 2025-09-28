@@ -1,5 +1,5 @@
 // Achievements.js - Система достижений и прогресса
-window.Achievement = class Achievement {
+class Achievement {
     constructor(id, title, description, condition, icon, rarity = 'common') {
         this.id = id;
         this.title = title;
@@ -45,7 +45,7 @@ window.Achievement = class Achievement {
     }
 }
 
-window.AchievementManager = class AchievementManager {
+class AchievementManager {
     constructor(game) {
         this.game = game;
         this.achievements = new Map();
@@ -615,3 +615,7 @@ window.AchievementManager = class AchievementManager {
         return Math.round((this.getUnlockedCount() / this.getTotalCount()) * 100);
     }
 }
+
+// Экспортируем классы для использования в других модулях
+window.Achievement = Achievement;
+window.AchievementManager = AchievementManager;

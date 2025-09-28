@@ -3,12 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Bat Cave Explorer - Enhanced Edition</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=3.1">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1a1a2e">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Bat Cave Explorer">
     <link rel="apple-touch-icon" href="assets/icon-192.png">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
@@ -95,14 +98,16 @@
                     </label>
                 </div>
                 <div class="settings-group">
-                    <label>
+                    <label class="difficulty-label">
                         Сложность:
-                        <select id="difficultySelect">
-                            <option value="easy">Легкая</option>
-                            <option value="normal" selected>Обычная</option>
-                            <option value="hard">Сложная</option>
-                            <option value="extreme">Экстремальная</option>
-                        </select>
+                        <div class="select-wrapper">
+                            <select id="difficultySelect" class="styled-select">
+                                <option value="easy">Легкая</option>
+                                <option value="normal" selected>Обычная</option>
+                                <option value="hard">Сложная</option>
+                                <option value="extreme">Экстремальная</option>
+                            </select>
+                        </div>
                     </label>
                 </div>
                 <div class="settings-group">
@@ -245,22 +250,55 @@
         </div>
     </div>
 
-    <!-- Game Scripts -->
-    <script src="js/sound.js"></script>
-    <script src="js/ui.js"></script>
-    <script src="js/bird.js"></script>
-    <script src="js/pipes.js"></script>
-    <script src="js/powerups.js"></script>
-    <script src="js/achievements.js"></script>
-    <script src="js/game.js"></script>
-    <script src="js/main.js"></script>
+    <!-- Game Scripts - Сначала все классы, потом инициализация -->
+    <script src="js/sound.js?v=3.0"></script>
+    <script src="js/bird.js?v=3.0"></script>
+    <script src="js/pipes.js?v=3.0"></script>
+    <script src="js/powerups.js?v=3.0"></script>
+    <script src="js/achievements.js?v=3.0"></script>
+    <script src="js/ui.js?v=3.2"></script>
+    <script src="js/game.js?v=3.0"></script>
+    <script src="js/main.js?v=3.0"></script>
+    <script src="js/init.js?v=3.0"></script>
 
     <!-- Service Worker Registration -->
     <script>
+        // Принудительная очистка кэша при загрузке
+        if ('caches' in window) {
+            caches.keys().then(cacheNames => {
+                cacheNames.forEach(cacheName => {
+                    if (cacheName.includes('flappy-bird') || cacheName.includes('bat-cave')) {
+                        console.log('Clearing old cache:', cacheName);
+                        caches.delete(cacheName);
+                    }
+                });
+            });
+        }
+        
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js')
-                .then(reg => console.log('Service Worker registered'))
-                .catch(err => console.log('Service Worker registration failed'));
+            navigator.serviceWorker.register('sw.js?v=3.0')
+                .then(registration => {
+                    console.log('Service Worker registered');
+                    
+                    // Принудительное обновление Service Worker
+                    if (registration.waiting) {
+                        registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+                    }
+                    
+                    // Обновление при изменении Service Worker
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                console.log('New Service Worker available, reloading...');
+                                window.location.reload();
+                            }
+                        });
+                    });
+                })
+                .catch(error => {
+                    console.log('Service Worker registration failed');
+                });
         }
     </script>
 </body>

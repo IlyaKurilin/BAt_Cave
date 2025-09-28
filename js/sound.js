@@ -1,5 +1,5 @@
 // Sound.js - Система управления звуками
-window.SoundManager = class SoundManager {
+class SoundManager {
     constructor() {
         this.enabled = true;
         this.volume = 0.5;
@@ -224,3 +224,6 @@ window.SoundManager = class SoundManager {
         return this.volume;
     }
 }
+
+// Экспортируем класс для использования в других модулях
+window.SoundManager = SoundManager;

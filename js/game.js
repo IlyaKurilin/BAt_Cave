@@ -1,5 +1,5 @@
 // Game.js - Основной игровой движок
-window.Game = class Game {
+class Game {
     constructor() {
         this.canvas = document.getElementById('gameCanvas');
         this.ctx = this.canvas.getContext('2d');
@@ -183,8 +183,8 @@ window.Game = class Game {
         this.fireworks.lastCelebration = 0;
         
         // Обновляем UI счёта
-        if (window.UI) {
-            window.UI.updateScore(this.score);
+        if (window.ui) {
+            window.ui.updateScore(this.score);
         }
         
         // Сброс игровых объектов
@@ -193,16 +193,7 @@ window.Game = class Game {
         this.powerUps.reset();
         
         // Применяем настройки сложности
-        const settings = this.difficultySettings[this.difficulty];
-        this.pipes.gap = settings.pipeGap;
-        this.pipes.speed = settings.pipeSpeed;
-        this.powerUps.spawnChance = settings.powerUpChance;
-        
-        // В режиме бога ускоряем игру в 4 раза
-        if (this.godMode) {
-            this.pipes.speed *= 4;
-            console.log(`🚀 Режим бога: скорость x4! (${this.pipes.speed})`);
-        }
+        this.applyDifficultySettings();
         
         // Генерируем новые облака
         this.background.clouds = this.generateClouds();
@@ -232,8 +223,8 @@ window.Game = class Game {
         this.achievements.checkAchievements(this.score);
         
         // Показываем экран окончания игры
-        if (window.UI) {
-            window.UI.showGameOver(this.score, this.highScore);
+        if (window.ui) {
+            window.ui.showGameOver(this.score, this.highScore);
         }
         
         // Воспроизводим звук окончания игры
@@ -247,8 +238,8 @@ window.Game = class Game {
         this.score += points;
         
         // Немедленное обновление UI счёта
-        if (window.UI) {
-            window.UI.updateScore(this.score);
+        if (window.ui) {
+            window.ui.updateScore(this.score);
         }
         
         // Проверяем, нужно ли изменить фон каждые 10 очков
@@ -312,8 +303,8 @@ window.Game = class Game {
         
         // Через 2 секунды показываем специальное сообщение
         setTimeout(() => {
-            if (window.UI) {
-                window.UI.showGodModeFinale(this.score);
+            if (window.ui) {
+                window.ui.showGodModeFinale(this.score);
             }
         }, 2000);
         
@@ -884,8 +875,8 @@ window.Game = class Game {
         this.render();
         
         // Обновление UI в реальном времени
-        if (window.UI && this.gameState === 'playing') {
-            window.UI.updateGameUI();
+        if (window.ui && this.gameState === 'playing') {
+            window.ui.updateGameUI();
         }
         
         // Следующий кадр
@@ -896,6 +887,36 @@ window.Game = class Game {
     saveDifficulty(difficulty) {
         this.difficulty = difficulty;
         localStorage.setItem('flappyDifficulty', difficulty);
+        
+        // Применяем настройки сложности немедленно, если игра активна
+        if (this.gameState === 'playing' || this.gameState === 'paused') {
+            this.applyDifficultySettings();
+        }
+        
+        console.log(`🎯 Сложность изменена на: ${difficulty}`);
+    }
+    
+    applyDifficultySettings() {
+        const settings = this.difficultySettings[this.difficulty];
+        if (!settings) {
+            console.warn(`⚠️ Неизвестная сложность: ${this.difficulty}`);
+            return;
+        }
+        
+        this.pipes.gap = settings.pipeGap;
+        this.pipes.speed = settings.pipeSpeed;
+        this.powerUps.spawnChance = settings.powerUpChance;
+        
+        // В режиме бога ускоряем игру в 4 раза
+        if (this.godMode) {
+            this.pipes.speed *= 4;
+        }
+        
+        console.log(`⚙️ Применены настройки сложности ${this.difficulty}:`, {
+            gap: this.pipes.gap,
+            speed: this.pipes.speed,
+            powerUpChance: this.powerUps.spawnChance
+        });
     }
     
     savePowerUpsEnabled(enabled) {
@@ -908,3 +929,6 @@ window.Game = class Game {
         localStorage.setItem('flappySound', enabled.toString());
     }
 }
+
+// Экспортируем класс для использования в других модулях
+window.Game = Game;
